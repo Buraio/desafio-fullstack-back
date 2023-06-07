@@ -35,10 +35,16 @@ export class ContactService {
     });
   }
 
-  async createContact(data: Prisma.ContactCreateInput): Promise<Contact> {
+  async createContact(
+    userId: string,
+    data: Prisma.ContactCreateInput,
+  ): Promise<Contact> {
     const contact = await this.prisma.contact.create({
       data: {
-        ...data,
+        fullName: data.fullName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        clientId: userId,
       },
       include: {
         client: true,
