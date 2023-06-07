@@ -21,7 +21,7 @@ export class AuthController {
     };
 
     return {
-      accessToken: await this.jwtService.signAsync(payload),
+      accessToken: this.jwtService.sign(payload),
     };
   }
 }
