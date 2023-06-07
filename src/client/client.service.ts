@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Client, Prisma } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class ClientService {
@@ -33,6 +34,23 @@ export class ClientService {
   }
 
   async createClient(data: Prisma.ClientCreateInput): Promise<Client> {
+    const validateUniqueEmail = await this.prisma.client.findUnique({
+      where: {
+        email: data.email,
+      },
+    });
+
+    if (validateUniqueEmail) {
+      throw new HttpException(
+        'Email is already in use',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password, 8);
+    }
+
     return this.prisma.client.create({
       data,
     });
